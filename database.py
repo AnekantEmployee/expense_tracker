@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from typing import List, Dict, Tuple
 import os
 
@@ -74,6 +74,26 @@ def get_today_expenses(user_id: int) -> List[Dict]:
     return expenses
 
 
+def get_yesterday_expenses(user_id: int) -> List[Dict]:
+    """Get yesterday's expenses for a user"""
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT * FROM expenses 
+        WHERE user_id = ? AND date = date('now', '-1 day')
+        ORDER BY created_at DESC
+        """,
+        (user_id,),
+    )
+
+    expenses = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+
+    return expenses
+
+
 def get_week_expenses(user_id: int) -> List[Dict]:
     """Get this week's expenses for a user"""
     conn = get_connection()
@@ -107,6 +127,44 @@ def get_month_expenses(user_id: int) -> List[Dict]:
         """,
         (user_id,),
     )
+
+    expenses = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+
+    return expenses
+
+
+def search_expenses(
+    user_id: int, search_term: str, timeframe: str = "all_time"
+) -> List[Dict]:
+    """Search for expenses matching a term"""
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Build date filter based on timeframe
+    date_filter = ""
+    if timeframe == "today":
+        date_filter = "AND date = date('now')"
+    elif timeframe == "yesterday":
+        date_filter = "AND date = date('now', '-1 day')"
+    elif timeframe == "this_week":
+        date_filter = "AND date >= date('now', '-7 days')"
+    elif timeframe == "this_month":
+        date_filter = "AND date >= date('now', 'start of month')"
+
+    query = f"""
+        SELECT * FROM expenses 
+        WHERE user_id = ? 
+        AND (
+            LOWER(description) LIKE ? 
+            OR LOWER(category) LIKE ?
+        )
+        {date_filter}
+        ORDER BY date DESC, created_at DESC
+    """
+
+    search_pattern = f"%{search_term.lower()}%"
+    cursor.execute(query, (user_id, search_pattern, search_pattern))
 
     expenses = [dict(row) for row in cursor.fetchall()]
     conn.close()
