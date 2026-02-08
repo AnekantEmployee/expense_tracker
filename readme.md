@@ -89,46 +89,6 @@ Open Telegram and find your bot. Send messages like:
 - `/month` - View this month's expenses
 - `/help` - Show help message
 
-## Deployment
-
-### Option 1: Railway
-
-1. Create account at [railway.app](https://railway.app)
-2. Click "New Project" → "Deploy from GitHub repo"
-3. Connect your repository
-4. Add environment variables in Settings
-5. Deploy
-
-### Option 2: Render
-
-1. Create account at [render.com](https://render.com)
-2. Click "New +" → "Web Service"
-3. Connect your GitHub repository
-4. Set build command: `pip install -r requirements.txt`
-5. Set start command: `python main.py`
-6. Add environment variables
-7. Deploy
-
-### Option 3: Fly.io
-
-```bash
-# Install flyctl
-curl -L https://fly.io/install.sh | sh
-
-# Login
-fly auth login
-
-# Launch app
-fly launch
-
-# Set secrets
-fly secrets set TELEGRAM_BOT_TOKEN=your_token
-fly secrets set GEMINI_API_KEY=your_key
-
-# Deploy
-fly deploy
-```
-
 ## Tech Stack
 
 - Python 3.8+
@@ -148,34 +108,6 @@ expense-bot/
 ├── .env             # Environment variables (create this)
 └── README.md        # Documentation
 ```
-
-## Troubleshooting
-
-**Bot not responding:**
-
-- Check if `main.py` is running
-- Verify your `TELEGRAM_BOT_TOKEN` is correct
-- Check internet connection
-
-**"Error parsing expense":**
-
-- Verify your `GEMINI_API_KEY` is correct
-- Check Gemini API quota/billing
-
-**Database errors:**
-
-- Delete `expenses.db` and restart (will lose data)
-- Check file permissions
-
-## Future Enhancements
-
-- Receipt image scanning
-- Budget alerts
-- Split expense tracking
-- Multi-currency support
-- Export to CSV/Excel
-- Recurring expenses
-- Web dashboard
 
 ## License
 
